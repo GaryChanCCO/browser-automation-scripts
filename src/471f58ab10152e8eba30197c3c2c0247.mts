@@ -231,7 +231,7 @@ async function selectDate(): Promise<void> {
                 offsetParent: node.offsetParent,
             };
         });
-        if (offsetParent === null || Number(innerText) !== targetDate.getDate()) continue;
+        if (offsetParent === null || Number(innerText) !== targetDate.getUTCDate()) continue;
         await el.evaluate((node) => (node as HTMLParagraphElement).click());
         break;
     }
@@ -253,24 +253,34 @@ async function selectTimeSlot(): Promise<void> {
     await bookDiv?.click();
     await page.waitForSelector('div.picker_box.max_width', { visible: true, timeout: 2000 });
     const rx = /\(Seat available：(\d+)\)/;
-    let canBook = false;
+    const candidateTimeSlots = new Set<string>();
+    for (const el of await page.$$('div.picker-item')) {
+        const innerText = await el.evaluate((node) => (node as HTMLDivElement).innerText);
+        for (const timeSlot of appConfig.timeSlots) {
+            if (innerText.startsWith(timeSlot)) {
+                const match = innerText.match(rx);
+                if (match === null) throw new Error(`Fatal error: Regex not match [${innerText}]`);
+                const availableSeat = Number(match[1]);
+                if (availableSeat < appConfig.tickets.length) {
+                    logger.warn(
+                        `${timeSlot} availableSeat(${availableSeat}) less than number of ticket required(${appConfig.tickets.length})`
+                    );
+                    break;
+                }
+                candidateTimeSlots.add(timeSlot);
+            }
+        }
+    }
+    const targetTimeSlot = appConfig.timeSlots.filter((timeSlot) => candidateTimeSlots.has(timeSlot))[0];
+    if (targetTimeSlot === undefined) throw new Error('Selected timesolts cannot be booked');
     for (const el of await page.$$('div.picker-item')) {
         const boundingBox = (await el.boundingBox())!;
         await page.mouse.click(boundingBox.x + (boundingBox.width >> 1), boundingBox.y + (boundingBox.height >> 1));
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 200));
         const innerText = await el.evaluate((node) => (node as HTMLDivElement).innerText);
-        if (!innerText.startsWith(appConfig.timeSlot)) continue;
-        const match = innerText.match(rx);
-        if (match === null) throw new Error('Regex not match');
-        const availableSeat = Number(match[1]);
-        if (availableSeat < appConfig.tickets.length)
-            throw new Error(
-                `availableSeat(${availableSeat}) less than number of ticket required(${appConfig.tickets.length})`
-            );
-        canBook = true;
+        if (!innerText.startsWith(targetTimeSlot)) continue;
         break;
     }
-    if (!canBook) throw new Error('Selected Timesolt cannot be booked');
     for (const el of await page.$$('div.picker_title > span.no')) {
         const offsetParent = await el.evaluate((node) => (node as HTMLSpanElement).offsetParent);
         if (offsetParent === null) continue;
@@ -433,7 +443,6 @@ try {
     await fillPassengerInfo();
     await tickAgreement();
     await crackChallengeAndSubmit();
-    await browser.close();
 } catch (e) {
     logger.error(e);
     await page.screenshot({ fullPage: true, path: appConfigFile + '.error.png' });

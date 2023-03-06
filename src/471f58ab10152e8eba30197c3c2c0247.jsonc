@@ -11,8 +11,8 @@
     "date": "2022-09-02",
     // "Daytime" / "Nighttime"
     "dayOrNight": "Nighttime",
-    // In format HH:MM
-    "timeSlot": "19:30",
+    // In format HH:MM, the first one that is available will be selected
+    "timeSlots": ["13:30", "13:00", "19:00", "17:00"],
     // At most 3 tickets
     "tickets": [
         { "type": "Child/Elderly", "name": "111", "idcardno": "1111" },
