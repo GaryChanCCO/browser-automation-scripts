@@ -231,8 +231,9 @@ async function selectDate(): Promise<void> {
                 offsetParent: node.offsetParent,
             };
         });
-        if (offsetParent === null || Number(innerText) !== targetDate.getDay()) continue;
+        if (offsetParent === null || Number(innerText) !== targetDate.getDate()) continue;
         await el.evaluate((node) => (node as HTMLParagraphElement).click());
+        break;
     }
 }
 
