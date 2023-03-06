@@ -1,0 +1,22 @@
+{
+    "url": "[Secret]",
+    "2captchaApiKey": "[Secret]",
+    "email": "[Secret]",
+    "password": "[Secret]",
+    //  Input as in website(English)
+    "from": "[Secret]",
+    // Input as in website(English)
+    "to": "[Secret]",
+    // In format YYYY-MM-DD
+    "date": "2022-09-02",
+    // "Daytime" / "Nighttime"
+    "dayOrNight": "Nighttime",
+    // In format HH:MM
+    "timeSlot": "19:30",
+    // At most 3 tickets
+    "tickets": [
+        { "type": "Child/Elderly", "name": "111", "idcardno": "1111" },
+        { "type": "Adult", "name": "222", "idcardno": "2222" },
+        { "type": "Adult", "name": "333", "idcardno": "3333" }
+    ]
+}

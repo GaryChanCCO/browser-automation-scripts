@@ -1,0 +1,24 @@
+{
+    "name": "browser-automation-scripts",
+    "author": "Dino Drinkwater",
+    "private": true,
+    "version": "0.0.0",
+    "engines": {
+        "node": "16"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^9.0.13",
+        "@typescript-eslint/eslint-plugin": "^5.33.1",
+        "@typescript-eslint/parser": "^5.33.1",
+        "eslint": "^8.22.0",
+        "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "axios": "^0.27.2",
+        "fs-extra": "^10.1.0",
+        "node-tesseract-ocr": "^2.2.1",
+        "puppeteer": "^16.2.0",
+        "source-map-support": "^0.5.21",
+        "winston": "^3.8.1"
+    }
+}
